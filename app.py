@@ -19,7 +19,15 @@ from kivy.uix.button import Button
 #  import popup
 from kivy.uix.popup import Popup
 
+#  import validate_email
+from validate_email import validate_email
 
+
+# import zxcvbn for password validation
+from zxcvbn import zxcvbn
+
+# import os 
+import os
 
 # Create class that we pass the App
 class RegistrationApp(App):
@@ -71,7 +79,72 @@ class RegistrationApp(App):
 
         return layout
     
-  
+    # validate password function
+    def validate_password(self, password):
+        result = zxcvbn(password)  
+        if result["score"] < 3:  
+                return False  
+        return True  
+    
+    # check if email already exists
+    def email_exists(self, email):
+        for filename in os.listdir():
+            if filename.endswith(".txt"):
+                with open(filename, "r") as file:
+                    for line in file:
+                        if "Email:" in line and email in line:
+                            return True
+        return False
+        
+    
+    # define a function to register the user
+    def register(self, instance):
+        # Get the values form the input
+        name = self.name_input.text
+        email = self.email_input.text
+        password = self.password_input.text
+        confirm_password = self.confirm_password_input.text
+
+        # validate email using validate_email function
+        is_valid = validate_email(email)
+
+
+        # some validations 
+        # 1. if inputs are empty
+        if name.strip() == '' or email.strip() == '' or password.strip() == '' or confirm_password.strip() == '':
+            message = "Please fill all the fields"
+
+        # 2. check if the password and confirm password are the same
+        elif password != confirm_password:
+            message = "Passwords do not match"
+        
+        # 3. check if email is valid
+        elif not is_valid:
+            message = "Please enter a valid email"
+
+        # 4. check if password is valid
+        elif not self.validate_password(password):
+            message = "Password must be stronger.\nTry adding more characters or symbols."
+        
+        # 5. check if email already exists
+        elif self.email_exists(email):
+            message = "This email is already registered.\nPlease use a different email."
+
+        # save user data inside a text file
+        else:
+            filename = name + ".txt"
+            with open(filename, "a") as file:
+                file.write('Name:{}\n'.format(name))
+                file.write('Email:{}\n'.format(email))
+                file.write('Password:{}\n'.format(password))
+                file.write('---\n')
+
+            message = "Registration Successful\nName: {}\nEmail: {}".format(name, email)
+        
+        # create popup for mesaage 
+        popup = Popup(title="Registration Status", content=Label(text=message), size_hint=(None, None), size=(400, 200))
+        popup.open()
+
 
 
 
