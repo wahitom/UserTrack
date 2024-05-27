@@ -13,6 +13,13 @@ from kivy.uix.label import Label
 # import textinput for the inputs
 from kivy.uix.textinput import TextInput
 
+# import Button
+from kivy.uix.button import Button
+
+#  import popup
+from kivy.uix.popup import Popup
+
+
 
 # Create class that we pass the App
 class RegistrationApp(App):
@@ -40,4 +47,34 @@ class RegistrationApp(App):
         confirm_password_label = Label(text="Confirm User Password", font_size=18)
         self.confirm_password_input = TextInput(multiline =False, font_size=18, password=True)
 
-      
+        # Create the registration button
+        submit_button = Button(text="Register", font_size=18, on_press=self.register)
+
+
+
+        # wrap our properties in a layout function so that they are visible
+        layout.add_widget(head_label)
+
+        layout.add_widget(name_label)
+        layout.add_widget(self.name_input)
+
+        layout.add_widget(email_label)
+        layout.add_widget(self.email_input)
+
+        layout.add_widget(password_label)
+        layout.add_widget(self.password_input)
+
+        layout.add_widget(confirm_password_label)
+        layout.add_widget(self.confirm_password_input)
+
+        layout.add_widget(submit_button)
+
+        return layout
+    
+  
+
+
+
+# call our class and run it 
+if __name__ == "__main__":
+    RegistrationApp().run()
